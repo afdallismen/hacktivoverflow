@@ -9,6 +9,9 @@ class Question {
         author: req.user.id
       })
       .then(question => {
+        return question.populate('author').execPopulate()
+      })
+      .then(question => {
         res.status(201).json({ question })
       })
       .catch(_ => res.status(500).json({ message: 'Internal Server Error.' }))

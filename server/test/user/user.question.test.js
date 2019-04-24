@@ -54,7 +54,7 @@ describe('User Question tests', function () {
           expect(res.body.question.description).to.equal(createdQuestion.description)
           expect(res.body.question.upvotes).to.equal(0)
           expect(res.body.question.downvotes).to.equal(0)
-          expect(res.body.question.author).to.equal(this.user.id)
+          expect(res.body.question.author._id).to.equal(this.user.id)
           expect(res.body.question.answers).to.be.an('array')
           done()
         })

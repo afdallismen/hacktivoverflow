@@ -4,6 +4,7 @@ class Question {
   static findAll (req, res) {
     models.Question
       .find()
+      .populate('author')
       .then(questions => res.status(200).json({ questions }))
       .catch(_ => res.status(500).json({ message: 'Invalid Server Error.' }))
   }
