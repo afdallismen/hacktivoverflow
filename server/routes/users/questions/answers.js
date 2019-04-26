@@ -1,4 +1,4 @@
-const routes = require('express').Router()
+const routes = require('express').Router({ mergeParams: true })
 
 const UserAnswer = require('../../../controllers/User/Answer')
 const { user, auth } = require('../../../middlewares')

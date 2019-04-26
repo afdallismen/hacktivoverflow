@@ -12,7 +12,13 @@ class Question {
   static findById (req, res) {
     models.Question
       .findById(req.params.question_id)
-      .populate('answers')
+      .populate('author')
+      .populate({
+        path: 'answers',
+        populate: {
+          path: 'author'
+        }
+      })
       .then(question => res.status(200).json({ question }))
       .catch(_ => res.status(500).json({ message: 'Invalid Server Error.' }))
   }

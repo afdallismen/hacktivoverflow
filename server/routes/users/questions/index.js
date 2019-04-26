@@ -6,6 +6,18 @@ const { user, auth } = require('../../../middlewares')
 routes.use('/:question_id/answers', require('./answers'))
 
 routes.post('/', auth.loggedIn, UserQuestion.create)
+routes.put(
+  '/:question_id',
+  auth.loggedIn,
+  user.isAuthorOfThis('Question'),
+  UserQuestion.update
+)
+routes.delete(
+  '/:question_id',
+  auth.loggedIn,
+  user.isAuthorOfThis('Question'),
+  UserQuestion.deleteQuestion
+)
 
 routes.put(
   '/:question_id/upvote',

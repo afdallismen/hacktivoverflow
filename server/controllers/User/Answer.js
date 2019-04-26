@@ -2,14 +2,22 @@ const models = require('../../models')
 
 class Answer {
   static create (req, res) {
-    models.Answer
-      .create({
-        title: req.body.title,
-        description: req.body.description,
-        author: req.user.id
-      })
-      .then(answer => {
-        res.status(201).json({ answer })
+    Promise.all([
+      models.Answer
+        .create({
+          title: req.body.title,
+          description: req.body.description,
+          author: req.user.id
+        })
+        .then(answer => answer.populate('author').execPopulate()),
+      models.Question
+        .findById(req.params.question_id)
+    ])
+      .then(([answer, question]) => {
+        question.answers.push(answer._id)
+        question.save(() => {
+          res.status(201).json({ answer })
+        })
       })
       .catch(_ => res.status(500).json({ message: 'Internal Server Error.' }))
   }
@@ -18,8 +26,13 @@ class Answer {
     models.Answer
       .findById(req.params.answer_id)
       .then(answer => {
-        answer[vote] += 1
-        return answer.save()
+        if (vote === 'upvotes') {
+          answer.downvotes.pull(req.user._id)
+        } else {
+          answer.upvotes.pull(req.user._id)
+        }
+        answer[vote].push(req.user._id)
+        return answer.save().then(answer => answer.populate('author').execPopulate())
       })
       .then(answer => {
         res.status(201).json({ answer })

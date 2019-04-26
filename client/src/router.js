@@ -7,6 +7,7 @@ import Register from './views/Register'
 import Login from './views/Login'
 import Dashboard from './views/Dashboard'
 import CreateQuestion from './views/CreateQuestion'
+import QuestionEdit from './views/QuestionEdit'
 import auth from './helpers/auth'
 
 Vue.use(Router)
@@ -49,6 +50,11 @@ const router = new Router({
           path: 'new-question',
           name: 'new-question',
           component: CreateQuestion
+        },
+        {
+          path: '/questions/:question_id/edit',
+          name: 'question-edit',
+          component: QuestionEdit
         }
       ]
     }

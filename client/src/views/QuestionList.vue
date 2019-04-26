@@ -10,7 +10,7 @@
           >
             <div class="columns has-text-centered">
               <div class="column">
-                <p v-html="question.upvotes + question.downvotes"></p>
+                <p v-html="question.upvotes.length - question.downvotes.length"></p>
                 <p>votes</p>
               </div>
               <div class="column">

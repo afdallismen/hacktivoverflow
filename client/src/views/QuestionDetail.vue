@@ -4,26 +4,40 @@
     <div class="is-divider mt8"></div>
     <div class="media">
       <div class="media-left ml0 mr24">
-        <VoteButtons @click="handleClickVotes"/>
+        <VoteButtons
+          :can-upvote="canUpvote"
+          :can-downvote="canDownvote"
+          :votes="question.upvotes.length - question.downvotes.length"
+          @click="handleClickVotes"/>
       </div>
       <div class="media-content">
         <div v-html="question.description"></div>
       </div>
     </div>
+    <div class="buttons is-right" v-if="isAuthor">
+      <b-button type="is-danger" icon-left="close" @click="handleClickDelete">Delete</b-button>
+      <b-button type="is-success" icon-left="pencil" @click="handleClickEdit">Edit</b-button>
+    </div>
     <AnswerList :answers="question.answers || []" class="mt81"/>
     <div class="mt81">
       <p class="is-size-4">Your Answer</p>
       <div class="is-divider mt8"></div>
-      <Wysiwyg v-model="answer"></Wysiwyg>
-      <div>
-        <div class="is-divider mb16"></div>
-        <div v-html="answer"></div>
-        <div class="is-divider mt16"></div>
-      </div>
-      <div class="buttons mt16 is-right">
-        <b-button @click="answer = ''" v-if="answer">Cancel</b-button>
-        <b-button type="is-success" @click="handleClickSubmit">Submit</b-button>
-      </div>
+      <form @submit.prevent="handleSubmit">
+        <b-field label="Title">
+          <b-input v-model="title"></b-input>
+        </b-field>
+        <b-field label="Description">
+          <Wysiwyg v-model="description"></Wysiwyg>
+        </b-field>
+        <div>
+          <div class="is-divider mb16"></div>
+          <div v-html="description"></div>
+          <div class="is-divider mt16"></div>
+        </div>
+        <div class="buttons mt16 is-right">
+          <b-button type="is-success" native-type="submit">Submit</b-button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -42,13 +56,22 @@ export default {
     Wysiwyg
   },
   data: () => ({
-    answer: ''
+    title: '',
+    description: ''
   }),
   computed: {
+    ...mapState('auth', ['user']),
     ...mapGetters('auth', ['loggedIn']),
+    ...mapGetters('questions', ['isAuthor']),
     ...mapState('questions', {
       question: 'detail'
     }),
+    canUpvote: function () {
+      return !this.question.upvotes.includes(this.user._id)
+    },
+    canDownvote: function () {
+      return !this.question.downvotes.includes(this.user._id)
+    }
   },
   created: function () {
     if (this.question) {
@@ -64,15 +87,39 @@ export default {
         }
       })
     },
-    handleClickSubmit: function () {
+    handleSubmit: function () {
       if (!this.loggedIn) {
         this.pushLogin()
+      } else {
+        this.$store.dispatch('questions/createAnswer', {
+          title: this.title,
+          description: this.description
+        })
+        this.title = ''
+        this.description = ''
       }
     },
     handleClickVotes: function (votes) {
       if (!this.loggedIn) {
         this.pushLogin()
+      } else {
+        this.$store.dispatch('questions/voteQuestion', {
+          question: this.question,
+          votes
+        })
       }
+    },
+    handleClickEdit: function () {
+      this.$router.push({
+        name: 'question-edit',
+        params: {
+          question_id: this.question._id
+        }
+      })
+    },
+    handleClickDelete: function () {
+      this.$store.dispatch('questions/deleteQuestion')
+      this.$router.push('/dashboard')
     }
   }
 }

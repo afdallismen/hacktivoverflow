@@ -4,24 +4,24 @@
       icon-right="chevron-up"
       class="has-text-info"
       @click="$emit('click', 'upvote')"
+      :disabled="!canUpvote"
     ></b-button>
     <p
       class="has-text-centered has-text-grey mt8 mb8 is-size-5"
-      v-html="questionVotes"
-    >questionVotes</p>
+      v-html="votes"
+    ></p>
     <b-button
       icon-right="chevron-down"
       class="has-text-info"
       @click="$emit('click', 'downvote')"
+      :disabled="!canDownvote"
     ></b-button>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
 export default {
-  computed: mapGetters('questions', ['questionVotes'])
+  props: ['votes', 'canUpvote', 'canDownvote']
 }
 </script>
 

@@ -26,5 +26,35 @@ export default {
         }
       })
       .then(({ data }) => data.question)
+  },
+  voteQuestion: (votes, { question }, { token }) => {
+    return axiosInstance
+      .put(`/users/${question.author}/questions/${question._id}/${votes}`, {}, {
+        headers: {
+          Authorization: token
+        }
+      })
+      .then(({ data }) => data.question)
+  },
+  updateQuestion: ({ title, description }, { question, token }) => {
+    return axiosInstance
+      .put(`/users/${question.author}/questions/${question._id}`, {
+        title,
+        description
+      }, {
+        headers: {
+          Authorization: token
+        }
+      })
+      .then(({ data }) => data.question)
+  },
+  deleteQuestion: ({ question }, { user_id, token }) => {
+    return axiosInstance
+      .delete(`/users/${user_id}/questions/${question._id}`, {
+        headers: {
+          Authorization: token
+        }
+      })
+      .then(({ data }) => data.question)
   }
 }
